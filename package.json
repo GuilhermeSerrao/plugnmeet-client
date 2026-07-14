@@ -1,0 +1,11 @@
+{
+  "name": "plugnmeet-client",
+  "version": "1.0.0",
+  "description": "Cliente Node.js (ESM, sem dependências) para a API do plugNmeet",
+  "type": "module",
+  "main": "src/index.js",
+  "engines": {
+    "node": ">=18"
+  },
+  "license": "MIT"
+}
