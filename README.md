@@ -91,6 +91,16 @@ const { cssUrls, jsUrls } = await client.getClientFiles();
 // div de montagem: <div id="plugNmeet-app"></div>
 ```
 
+## Testar via HTML (local)
+
+Há uma página de teste em `examples/` — servidor Node nativo (sem deps) que serve o HTML e chama o `PlugNMeetClient` no backend (o API secret nunca vai pro browser).
+
+```bash
+node --env-file=.env examples/server.js
+```
+
+Abrir `http://localhost:3000`. A página permite: criar sala, gerar link de entrada, verificar sala ativa, listar salas ativas e encerrar sala.
+
 ## API
 
 Ver `plugnmeet-nodejs-client-handoff.md` para a especificação completa dos 20 endpoints implementados (Room, Recording, Artifact, Get Client Files).

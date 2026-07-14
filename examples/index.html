@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="pt">
+<head>
+<meta charset="utf-8">
+<title>plugNmeet client — tester local</title>
+<style>
+  body { font-family: system-ui, sans-serif; max-width: 720px; margin: 2rem auto; padding: 0 1rem; }
+  fieldset { margin-bottom: 1.5rem; }
+  label { display: block; margin: 0.5rem 0 0.2rem; font-size: 0.9rem; }
+  input { width: 100%; padding: 0.4rem; box-sizing: border-box; }
+  button { margin-top: 0.8rem; padding: 0.5rem 1rem; cursor: pointer; }
+  pre { background: #111; color: #0f0; padding: 1rem; overflow-x: auto; white-space: pre-wrap; word-break: break-all; }
+  a { color: #06c; }
+</style>
+</head>
+<body>
+<h1>plugNmeet client — tester local</h1>
+<p>Chama o backend em <code>examples/server.js</code>, que usa o <code>PlugNMeetClient</code> com as credenciais do <code>.env</code>. O secret nunca chega ao browser.</p>
+
+<fieldset>
+  <legend>1. Criar sala</legend>
+  <label>Room ID</label>
+  <input id="createRoomId" value="test-room">
+  <label>Título</label>
+  <input id="createTitle" value="Sala de teste">
+  <button onclick="createRoom()">Criar sala</button>
+</fieldset>
+
+<fieldset>
+  <legend>2. Gerar link de entrada</legend>
+  <label>Room ID</label>
+  <input id="joinRoomId" value="test-room">
+  <label>Nome</label>
+  <input id="joinName" value="Convidado">
+  <label><input type="checkbox" id="joinAdmin" style="width:auto"> É admin</label>
+  <button onclick="getJoinLink()">Gerar link</button>
+  <p id="joinLinkResult"></p>
+</fieldset>
+
+<fieldset>
+  <legend>3. Sala ativa?</legend>
+  <label>Room ID</label>
+  <input id="activeRoomId" value="test-room">
+  <button onclick="isActive()">Verificar</button>
+</fieldset>
+
+<fieldset>
+  <legend>4. Listar salas ativas</legend>
+  <button onclick="listActive()">Listar</button>
+</fieldset>
+
+<fieldset>
+  <legend>5. Encerrar sala</legend>
+  <label>Room ID</label>
+  <input id="endRoomId" value="test-room">
+  <button onclick="endRoom()">Encerrar</button>
+</fieldset>
+
+<h3>Resposta</h3>
+<pre id="output">—</pre>
+
+<script>
+async function call(path, body) {
+  const res = await fetch(path, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body || {}),
+  });
+  const data = await res.json();
+  document.getElementById('output').textContent = JSON.stringify(data, null, 2);
+  return data;
+}
+
+function createRoom() {
+  call('/api/create-room', {
+    roomId: document.getElementById('createRoomId').value,
+    title: document.getElementById('createTitle').value,
+  });
+}
+
+async function getJoinLink() {
+  const data = await call('/api/join-token', {
+    roomId: document.getElementById('joinRoomId').value,
+    name: document.getElementById('joinName').value,
+    isAdmin: document.getElementById('joinAdmin').checked,
+  });
+  const el = document.getElementById('joinLinkResult');
+  if (data.joinUrl) {
+    el.innerHTML = `<a href="${data.joinUrl}" target="_blank">${data.joinUrl}</a>`;
+  } else {
+    el.textContent = '';
+  }
+}
+
+function isActive() {
+  call('/api/is-active', { roomId: document.getElementById('activeRoomId').value });
+}
+
+function listActive() {
+  call('/api/active-rooms');
+}
+
+function endRoom() {
+  call('/api/end-room', { roomId: document.getElementById('endRoomId').value });
+}
+</script>
+</body>
+</html>
