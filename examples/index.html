@@ -11,16 +11,21 @@
   button { margin-top: 0.8rem; padding: 0.5rem 1rem; cursor: pointer; }
   pre { background: #111; color: #0f0; padding: 1rem; overflow-x: auto; white-space: pre-wrap; word-break: break-all; }
   a { color: #06c; }
+  .error { color: #c00; font-weight: bold; }
+  #roomIdBox { background: #f0f0f0; padding: 1rem; border-radius: 6px; }
 </style>
 </head>
 <body>
 <h1>plugNmeet client — tester local</h1>
 <p>Chama o backend em <code>examples/server.js</code>, que usa o <code>PlugNMeetClient</code> com as credenciais do <code>.env</code>. O secret nunca chega ao browser.</p>
 
+<div id="roomIdBox">
+  <label>Room ID (usado por todas as ações abaixo)</label>
+  <input id="roomId" value="test-room">
+</div>
+
 <fieldset>
   <legend>1. Criar sala</legend>
-  <label>Room ID</label>
-  <input id="createRoomId" value="test-room">
   <label>Título</label>
   <input id="createTitle" value="Sala de teste">
   <button onclick="createRoom()">Criar sala</button>
@@ -28,8 +33,7 @@
 
 <fieldset>
   <legend>2. Gerar link de entrada</legend>
-  <label>Room ID</label>
-  <input id="joinRoomId" value="test-room">
+  <p><em>A sala tem de estar criada e ativa (passo 1) antes de gerar o link — caso contrário a API devolve erro.</em></p>
   <label>Nome</label>
   <input id="joinName" value="Convidado">
   <label><input type="checkbox" id="joinAdmin" style="width:auto"> É admin</label>
@@ -39,8 +43,6 @@
 
 <fieldset>
   <legend>3. Sala ativa?</legend>
-  <label>Room ID</label>
-  <input id="activeRoomId" value="test-room">
   <button onclick="isActive()">Verificar</button>
 </fieldset>
 
@@ -51,8 +53,6 @@
 
 <fieldset>
   <legend>5. Encerrar sala</legend>
-  <label>Room ID</label>
-  <input id="endRoomId" value="test-room">
   <button onclick="endRoom()">Encerrar</button>
 </fieldset>
 
@@ -60,6 +60,10 @@
 <pre id="output">—</pre>
 
 <script>
+function roomId() {
+  return document.getElementById('roomId').value;
+}
+
 async function call(path, body) {
   const res = await fetch(path, {
     method: 'POST',
@@ -73,14 +77,14 @@ async function call(path, body) {
 
 function createRoom() {
   call('/api/create-room', {
-    roomId: document.getElementById('createRoomId').value,
+    roomId: roomId(),
     title: document.getElementById('createTitle').value,
   });
 }
 
 async function getJoinLink() {
   const data = await call('/api/join-token', {
-    roomId: document.getElementById('joinRoomId').value,
+    roomId: roomId(),
     name: document.getElementById('joinName').value,
     isAdmin: document.getElementById('joinAdmin').checked,
   });
@@ -88,12 +92,12 @@ async function getJoinLink() {
   if (data.joinUrl) {
     el.innerHTML = `<a href="${data.joinUrl}" target="_blank">${data.joinUrl}</a>`;
   } else {
-    el.textContent = '';
+    el.innerHTML = `<span class="error">Falhou: ${data.msg || 'erro desconhecido'} — verifica se a sala foi criada (passo 1) e está ativa.</span>`;
   }
 }
 
 function isActive() {
-  call('/api/is-active', { roomId: document.getElementById('activeRoomId').value });
+  call('/api/is-active', { roomId: roomId() });
 }
 
 function listActive() {
@@ -101,7 +105,7 @@ function listActive() {
 }
 
 function endRoom() {
-  call('/api/end-room', { roomId: document.getElementById('endRoomId').value });
+  call('/api/end-room', { roomId: roomId() });
 }
 </script>
 </body>
