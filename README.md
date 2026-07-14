@@ -1,15 +1,17 @@
 # plugnmeet-client
 
-Cliente Node.js (ESM, sem dependências de runtime) para a API do [plugNmeet](https://www.plugnmeet.org).
+Node.js client (ESM, no runtime dependencies) for the [plugNmeet](https://www.plugnmeet.org) API.
 
-## Instalação
+## Install
 
 ```bash
 npm install
 cp .env.example .env
 ```
 
-## Uso
+Fill in `.env` with your plugNmeet server URL, API key, and API secret.
+
+## Usage
 
 ```js
 import PlugNMeetClient from './src/index.js';
@@ -21,11 +23,11 @@ const client = new PlugNMeetClient({
 });
 ```
 
-### Criar sala e gerar link de entrada
+### Create a room and generate a join link
 
 ```js
 await client.createRoom('room01', {
-  metadata: { room_title: 'Reunião de equipa' },
+  metadata: { room_title: 'Team meeting' },
 });
 
 const { token } = await client.getJoinToken('room01', {
@@ -35,23 +37,23 @@ const { token } = await client.getJoinToken('room01', {
 });
 
 const joinUrl = client.buildJoinUrl(token);
-console.log(joinUrl); // https://meet.digitalrocket.pt/?access_token=<TOKEN>
+console.log(joinUrl); // https://your-server.example.com/?access_token=<TOKEN>
 ```
 
-### Listar salas ativas
+### List active rooms
 
 ```js
 const { rooms } = await client.getActiveRoomsInfo();
 console.log(rooms);
 ```
 
-### Encerrar sala
+### End a room
 
 ```js
 await client.endRoom('room01');
 ```
 
-### Listar e apagar gravações
+### List and delete recordings
 
 ```js
 const { result } = await client.fetchRecordings(['room01']);
@@ -60,49 +62,64 @@ console.log(result.rooms_list);
 await client.deleteRecording('RM_xxx');
 ```
 
-### Obter URL de download de uma gravação
+### Get a recording download URL
 
 ```js
 const url = await client.getRecordingDownloadUrl('RM_xxx');
-console.log(url); // https://meet.digitalrocket.pt/download/recording/<TOKEN>
+console.log(url); // https://your-server.example.com/download/recording/<TOKEN>
 ```
 
-### Enviar mensagem de chat / notificação para a sala
+### Send a chat message / notification to a room
 
 ```js
-await client.sendChatMessage('room01', 'Olá a todos');
-await client.sendNotification('room01', 'A gravação vai começar', { type: 1 });
+await client.sendChatMessage('room01', 'Hello everyone');
+await client.sendNotification('room01', 'Recording is about to start', { type: 1 });
 ```
 
-### Upload de ficheiro para o whiteboard
+### Upload a whiteboard file
 
 ```js
 await client.uploadWhiteboardFile('room01', { filePath: './slides.pdf' });
-// ou
+// or
 await client.uploadWhiteboardFile('room01', { documentLink: 'https://example.com/slides.pdf' });
 ```
 
-### Embutir o client sem iframe
+### Embed the official client without an iframe
 
 ```js
 const { cssUrls, jsUrls } = await client.getClientFiles();
-// <link rel="stylesheet" href="..."> para cada cssUrls
-// <script src="..." defer> (ou type="module" para o ficheiro main-module.*) para cada jsUrls
-// div de montagem: <div id="plugNmeet-app"></div>
+// <link rel="stylesheet" href="..."> for each cssUrls
+// <script src="..." defer> (or type="module" for the main-module.* file) for each jsUrls
+// mount point: <div id="plugNmeet-app"></div>
 ```
 
-## Testar via HTML (local)
+## Testing with the HTML page (local)
 
-Há uma página de teste em `examples/` — servidor Node nativo (sem deps) que serve o HTML e chama o `PlugNMeetClient` no backend (o API secret nunca vai pro browser).
+`examples/` has a small tester — a native Node server (no deps) that serves an HTML page and calls `PlugNMeetClient` on the backend (the API secret never reaches the browser).
 
 ```bash
 node --env-file=.env examples/server.js
 ```
 
-Abrir `http://localhost:3000`. A página permite: criar sala, gerar link de entrada, verificar sala ativa, listar salas ativas e encerrar sala.
+Open `http://localhost:3000`. The page lets you: create a room, generate a join link (as admin or guest), check if a room is active, list active rooms, and end a room. All actions share a single Room ID field, so create the room first before generating a join link for it.
 
-## API
+## API coverage
 
-Ver `plugnmeet-nodejs-client-handoff.md` para a especificação completa dos 20 endpoints implementados (Room, Recording, Artifact, Get Client Files).
+All methods are `async` and throw an `Error` (with `.statusCode` and `.response`) when the API returns `status: false`.
 
-Todos os métodos são `async` e lançam um `Error` (com `.statusCode` e `.response`) quando a API devolve `status: false`.
+### Room
+`createRoom`, `getJoinToken` + `buildJoinUrl`, `isRoomActive`, `getActiveRoomInfo`, `getActiveRoomsInfo`, `sendChatMessage`, `sendNotification`, `uploadWhiteboardFile`, `fetchPastRooms`, `endRoom`
+
+### Recording
+`fetchRecordings`, `getRecordingInfo`, `getRecordingDownloadUrl`, `deleteRecording`, `updateRecordingMetadata`, `mergeRecordingsBySession`, `mergeRecordingsByIds`
+
+### Artifact
+`fetchArtifacts`, `getArtifactInfo`, `getArtifactDownloadUrl`, `deleteArtifact`
+
+### Client files
+`getClientFiles` — for embedding the official plugNmeet web client without an iframe
+
+## Notes
+
+- Join tokens are one-time-use and short-lived — generate one and consume it immediately, don't cache it.
+- Live in-call moderation (e.g. force-muting a participant who's already talking) is not part of the documented `/auth` REST API this client wraps — it goes through plugNmeet's internal real-time protocol (NATS + protobuf) used by the official web client. `is_admin` and `lock_settings` (at join time or as room defaults) control permissions before/at join; use the official client (via `getClientFiles`) for live moderation controls.

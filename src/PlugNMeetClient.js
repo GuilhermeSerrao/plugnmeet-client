@@ -96,7 +96,7 @@ export default class PlugNMeetClient {
 
   constructor({ serverUrl, apiKey, apiSecret }) {
     if (!serverUrl || !apiKey || !apiSecret) {
-      throw new Error('serverUrl, apiKey e apiSecret são obrigatórios');
+      throw new Error('serverUrl, apiKey and apiSecret are required');
     }
     this.serverUrl = serverUrl.replace(/\/+$/, '');
     this.apiKey = apiKey;
@@ -125,7 +125,7 @@ export default class PlugNMeetClient {
     try {
       data = await res.json();
     } catch {
-      throw new Error(`plugNmeet API: resposta inválida (HTTP ${res.status})`);
+      throw new Error(`plugNmeet API: invalid response (HTTP ${res.status})`);
     }
     if (data.status === false) {
       const err = new Error(data.msg || 'plugNmeet API error');
@@ -197,10 +197,10 @@ export default class PlugNMeetClient {
 
   async uploadWhiteboardFile(roomId, { filePath, documentLink } = {}) {
     if (!filePath && !documentLink) {
-      throw new Error('Fornecer filePath ou documentLink');
+      throw new Error('Provide filePath or documentLink');
     }
     if (filePath && documentLink) {
-      throw new Error('Fornecer apenas um de filePath ou documentLink, não ambos');
+      throw new Error('Provide only one of filePath or documentLink, not both');
     }
 
     const signature = createHmac('sha256', this.#apiSecret).update(roomId).digest('hex');

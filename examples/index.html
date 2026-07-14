@@ -1,8 +1,8 @@
 <!doctype html>
-<html lang="pt">
+<html lang="en">
 <head>
 <meta charset="utf-8">
-<title>plugNmeet client — tester local</title>
+<title>plugNmeet client — local tester</title>
 <style>
   body { font-family: system-ui, sans-serif; max-width: 720px; margin: 2rem auto; padding: 0 1rem; }
   fieldset { margin-bottom: 1.5rem; }
@@ -16,47 +16,47 @@
 </style>
 </head>
 <body>
-<h1>plugNmeet client — tester local</h1>
-<p>Chama o backend em <code>examples/server.js</code>, que usa o <code>PlugNMeetClient</code> com as credenciais do <code>.env</code>. O secret nunca chega ao browser.</p>
+<h1>plugNmeet client — local tester</h1>
+<p>Calls the backend in <code>examples/server.js</code>, which uses <code>PlugNMeetClient</code> with the credentials from <code>.env</code>. The API secret never reaches the browser.</p>
 
 <div id="roomIdBox">
-  <label>Room ID (usado por todas as ações abaixo)</label>
+  <label>Room ID (used by every action below)</label>
   <input id="roomId" value="test-room">
 </div>
 
 <fieldset>
-  <legend>1. Criar sala</legend>
-  <label>Título</label>
-  <input id="createTitle" value="Sala de teste">
-  <button onclick="createRoom()">Criar sala</button>
+  <legend>1. Create room</legend>
+  <label>Title</label>
+  <input id="createTitle" value="Test room">
+  <button onclick="createRoom()">Create room</button>
 </fieldset>
 
 <fieldset>
-  <legend>2. Gerar link de entrada</legend>
-  <p><em>A sala tem de estar criada e ativa (passo 1) antes de gerar o link — caso contrário a API devolve erro.</em></p>
-  <label>Nome</label>
-  <input id="joinName" value="Convidado">
-  <label><input type="checkbox" id="joinAdmin" style="width:auto"> É admin</label>
-  <button onclick="getJoinLink()">Gerar link</button>
+  <legend>2. Generate join link</legend>
+  <p><em>The room must be created and active (step 1) before generating a link — otherwise the API returns an error.</em></p>
+  <label>Name</label>
+  <input id="joinName" value="Guest">
+  <label><input type="checkbox" id="joinAdmin" style="width:auto"> Is admin</label>
+  <button onclick="getJoinLink()">Generate link</button>
   <p id="joinLinkResult"></p>
 </fieldset>
 
 <fieldset>
-  <legend>3. Sala ativa?</legend>
-  <button onclick="isActive()">Verificar</button>
+  <legend>3. Is room active?</legend>
+  <button onclick="isActive()">Check</button>
 </fieldset>
 
 <fieldset>
-  <legend>4. Listar salas ativas</legend>
-  <button onclick="listActive()">Listar</button>
+  <legend>4. List active rooms</legend>
+  <button onclick="listActive()">List</button>
 </fieldset>
 
 <fieldset>
-  <legend>5. Encerrar sala</legend>
-  <button onclick="endRoom()">Encerrar</button>
+  <legend>5. End room</legend>
+  <button onclick="endRoom()">End</button>
 </fieldset>
 
-<h3>Resposta</h3>
+<h3>Response</h3>
 <pre id="output">—</pre>
 
 <script>
@@ -92,7 +92,7 @@ async function getJoinLink() {
   if (data.joinUrl) {
     el.innerHTML = `<a href="${data.joinUrl}" target="_blank">${data.joinUrl}</a>`;
   } else {
-    el.innerHTML = `<span class="error">Falhou: ${data.msg || 'erro desconhecido'} — verifica se a sala foi criada (passo 1) e está ativa.</span>`;
+    el.innerHTML = `<span class="error">Failed: ${data.msg || 'unknown error'} — check that the room was created (step 1) and is active.</span>`;
   }
 }
 
