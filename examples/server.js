@@ -2,10 +2,34 @@ import { createServer } from 'node:http';
 import { readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
+import { timingSafeEqual } from 'node:crypto';
 import PlugNMeetClient from '../src/index.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const PORT = process.env.PORT || 3000;
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
+
+// Room-management routes require a shared password (HTTP Basic Auth) since this
+// tester has no per-user accounts. /join and /api/join-token stay open — that's
+// the link meant to be shared with listeners/presenters.
+const PROTECTED_ROUTES = new Set([
+  'GET /',
+  'POST /api/create-room',
+  'POST /api/end-room',
+  'POST /api/active-rooms',
+  'POST /api/is-active',
+]);
+
+function isAuthorized(req) {
+  if (!ADMIN_PASSWORD) return false;
+  const match = /^Basic\s+(.+)$/i.exec(req.headers['authorization'] || '');
+  if (!match) return false;
+
+  const [, password = ''] = Buffer.from(match[1], 'base64').toString('utf8').split(':');
+  const given = Buffer.from(password);
+  const expected = Buffer.from(ADMIN_PASSWORD);
+  return given.length === expected.length && timingSafeEqual(given, expected);
+}
 
 const client = new PlugNMeetClient({
   serverUrl: process.env.PLUGNMEET_SERVER_URL,
@@ -60,6 +84,15 @@ const routes = {
 const server = createServer(async (req, res) => {
   const key = `${req.method} ${new URL(req.url, 'http://localhost').pathname}`;
 
+  if (PROTECTED_ROUTES.has(key) && !isAuthorized(req)) {
+    res.writeHead(401, {
+      'Content-Type': 'application/json',
+      'WWW-Authenticate': 'Basic realm="plugNmeet tester"',
+    });
+    res.end(JSON.stringify({ status: false, msg: 'Unauthorized' }));
+    return;
+  }
+
   if (key === 'GET /') {
     const html = await readFile(join(__dirname, 'index.html'), 'utf8');
     res.writeHead(200, { 'Content-Type': 'text/html' });
@@ -94,4 +127,7 @@ const server = createServer(async (req, res) => {
 
 server.listen(PORT, () => {
   console.log(`plugNmeet client tester: http://localhost:${PORT}`);
+  if (!ADMIN_PASSWORD) {
+    console.warn('ADMIN_PASSWORD not set — room-management routes are locked out until it is configured.');
+  }
 });
