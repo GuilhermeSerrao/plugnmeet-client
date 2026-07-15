@@ -55,17 +55,26 @@
 </fieldset>
 
 <fieldset>
-  <legend>3. Is room active?</legend>
+  <legend>3. Shareable links</legend>
+  <p><em>Each link opens a page where the person picks their own name before joining. Share the listener link widely; share the presenter link only with people who should have presenter rights.</em></p>
+  <button onclick="getShareableLink(false)">Generate listener link</button>
+  <p id="shareableLinkResult"></p>
+  <button onclick="getShareableLink(true)">Generate presenter link</button>
+  <p id="presenterLinkResult"></p>
+</fieldset>
+
+<fieldset>
+  <legend>4. Is room active?</legend>
   <button onclick="isActive()">Check</button>
 </fieldset>
 
 <fieldset>
-  <legend>4. List active rooms</legend>
+  <legend>5. List active rooms</legend>
   <button onclick="listActive()">List</button>
 </fieldset>
 
 <fieldset>
-  <legend>5. End room</legend>
+  <legend>6. End room</legend>
   <button onclick="endRoom()">End</button>
 </fieldset>
 
@@ -119,6 +128,12 @@ async function getJoinLink() {
   } else {
     el.innerHTML = `<span class="error">Failed: ${data.msg || 'unknown error'} — check that the room was created (step 1) and is active.</span>`;
   }
+}
+
+function getShareableLink(asPresenter) {
+  const url = `${location.origin}/join?room=${encodeURIComponent(roomId())}${asPresenter ? '&admin=1' : ''}`;
+  const target = asPresenter ? 'presenterLinkResult' : 'shareableLinkResult';
+  document.getElementById(target).innerHTML = `<a href="${url}" target="_blank">${url}</a>`;
 }
 
 function isActive() {

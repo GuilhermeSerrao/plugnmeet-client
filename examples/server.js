@@ -67,6 +67,13 @@ const server = createServer(async (req, res) => {
     return;
   }
 
+  if (key === 'GET /join') {
+    const html = await readFile(join(__dirname, 'join.html'), 'utf8');
+    res.writeHead(200, { 'Content-Type': 'text/html' });
+    res.end(html);
+    return;
+  }
+
   const handler = routes[key];
   if (!handler) {
     sendJson(res, 404, { status: false, msg: 'not found' });

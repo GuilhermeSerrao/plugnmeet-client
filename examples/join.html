@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Join meeting</title>
+<style>
+  body { font-family: system-ui, sans-serif; max-width: 420px; margin: 4rem auto; padding: 0 1rem; }
+  label { display: block; margin: 0.5rem 0 0.2rem; font-size: 0.9rem; }
+  input { width: 100%; padding: 0.6rem; box-sizing: border-box; font-size: 1rem; }
+  button { margin-top: 1rem; padding: 0.7rem 1.2rem; cursor: pointer; width: 100%; font-size: 1rem; }
+  .error { color: #c00; margin-top: 0.8rem; }
+  h1 { font-size: 1.3rem; }
+</style>
+</head>
+<body>
+<h1 id="heading">Join meeting</h1>
+<form id="joinForm">
+  <label>Your name</label>
+  <input id="name" required autofocus placeholder="e.g. Guilherme">
+  <button type="submit">Join</button>
+</form>
+<p id="error" class="error"></p>
+
+<script>
+const params = new URLSearchParams(location.search);
+const roomId = params.get('room');
+const isAdmin = params.get('admin') === '1';
+
+if (isAdmin) {
+  document.getElementById('heading').textContent = 'Join as presenter';
+  document.title = 'Join as presenter';
+}
+
+if (!roomId) {
+  document.getElementById('error').textContent = 'Missing room in the link.';
+  document.getElementById('joinForm').style.display = 'none';
+}
+
+document.getElementById('joinForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const name = document.getElementById('name').value.trim();
+  if (!name) return;
+
+  const button = e.target.querySelector('button');
+  button.disabled = true;
+  button.textContent = 'Joining...';
+
+  try {
+    const res = await fetch('/api/join-token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ roomId, name, isAdmin }),
+    });
+    const data = await res.json();
+    if (data.joinUrl) {
+      location.href = data.joinUrl;
+    } else {
+      throw new Error(data.msg || 'Failed to join');
+    }
+  } catch (err) {
+    document.getElementById('error').textContent = err.message;
+    button.disabled = false;
+    button.textContent = 'Join';
+  }
+});
+</script>
+</body>
+</html>
