@@ -28,6 +28,19 @@
   <legend>1. Create room</legend>
   <label>Title</label>
   <input id="createTitle" value="Test room">
+
+  <p style="margin-bottom:0.2rem;"><strong>Lock settings (applies to everyone except admins/presenters)</strong></p>
+  <label><input type="checkbox" id="lockMicrophone" style="width:auto"> Disable microphone for everyone</label>
+  <label><input type="checkbox" id="lockWebcam" style="width:auto"> Disable webcam for everyone</label>
+  <label><input type="checkbox" id="lockScreenSharing" style="width:auto" checked> Disable screen sharing for everyone</label>
+  <label><input type="checkbox" id="lockWhiteboard" style="width:auto" checked> Disable whiteboard for everyone</label>
+  <label><input type="checkbox" id="lockSharedNotepad" style="width:auto" checked> Disable shared notepad for everyone</label>
+  <label><input type="checkbox" id="lockReactions" style="width:auto"> Disable reactions for everyone</label>
+  <label><input type="checkbox" id="lockChat" style="width:auto"> Disable public chat</label>
+  <label><input type="checkbox" id="lockChatSendMessage" style="width:auto"> Disable sending chat messages</label>
+  <label><input type="checkbox" id="lockChatFileShare" style="width:auto"> Disable file sharing in chat</label>
+  <label><input type="checkbox" id="lockPrivateChat" style="width:auto"> Disable private chat</label>
+
   <button onclick="createRoom()">Create room</button>
 </fieldset>
 
@@ -79,6 +92,18 @@ function createRoom() {
   call('/api/create-room', {
     roomId: roomId(),
     title: document.getElementById('createTitle').value,
+    lockSettings: {
+      lock_microphone: document.getElementById('lockMicrophone').checked,
+      lock_webcam: document.getElementById('lockWebcam').checked,
+      lock_screen_sharing: document.getElementById('lockScreenSharing').checked,
+      lock_whiteboard: document.getElementById('lockWhiteboard').checked,
+      lock_shared_notepad: document.getElementById('lockSharedNotepad').checked,
+      lock_reactions: document.getElementById('lockReactions').checked,
+      lock_chat: document.getElementById('lockChat').checked,
+      lock_chat_send_message: document.getElementById('lockChatSendMessage').checked,
+      lock_chat_file_share: document.getElementById('lockChatFileShare').checked,
+      lock_private_chat: document.getElementById('lockPrivateChat').checked,
+    },
   });
 }
 

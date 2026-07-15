@@ -40,6 +40,18 @@ const joinUrl = client.buildJoinUrl(token);
 console.log(joinUrl); // https://your-server.example.com/?access_token=<TOKEN>
 ```
 
+### Lock listeners' microphone and webcam
+
+Pass `listenersLocked: true` to keep everyone except admins/presenters from ever
+enabling their mic or webcam, for the whole meeting (not just at join time):
+
+```js
+await client.createRoom('room01', {
+  listenersLocked: true,
+  metadata: { room_title: 'Webinar' },
+});
+```
+
 ### List active rooms
 
 ```js

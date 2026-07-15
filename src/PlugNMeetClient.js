@@ -139,7 +139,15 @@ export default class PlugNMeetClient {
   // ---- Room ----
 
   async createRoom(roomId, options = {}) {
-    const metadata = mergeDeep(DEFAULT_ROOM_METADATA, options.metadata || {});
+    let metadata = DEFAULT_ROOM_METADATA;
+    if (options.listenersLocked) {
+      // Only admins/presenters get their mic and webcam unlocked automatically;
+      // everyone else stays locked for the whole meeting, not just at join.
+      metadata = mergeDeep(metadata, {
+        default_lock_settings: { lock_microphone: true, lock_webcam: true },
+      });
+    }
+    metadata = mergeDeep(metadata, options.metadata || {});
     const body = { room_id: roomId, metadata };
     if (options.max_participants !== undefined) body.max_participants = options.max_participants;
     if (options.empty_timeout !== undefined) body.empty_timeout = options.empty_timeout;

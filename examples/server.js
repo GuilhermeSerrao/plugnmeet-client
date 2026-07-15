@@ -27,8 +27,13 @@ function sendJson(res, status, data) {
 
 const routes = {
   'POST /api/create-room': async (req) => {
-    const { roomId, title } = await readJsonBody(req);
-    return client.createRoom(roomId, { metadata: { room_title: title || 'Test room' } });
+    const { roomId, title, lockSettings } = await readJsonBody(req);
+    return client.createRoom(roomId, {
+      metadata: {
+        room_title: title || 'Test room',
+        default_lock_settings: lockSettings || {},
+      },
+    });
   },
   'POST /api/join-token': async (req) => {
     const { roomId, name, isAdmin } = await readJsonBody(req);
