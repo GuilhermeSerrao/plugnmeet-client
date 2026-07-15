@@ -117,7 +117,7 @@ function createRoom() {
 }
 
 async function getJoinLink() {
-  const data = await call('/api/join-token', {
+  const data = await call('/api/direct-join-token', {
     roomId: roomId(),
     name: document.getElementById('joinName').value,
     isAdmin: document.getElementById('joinAdmin').checked,
@@ -130,10 +130,18 @@ async function getJoinLink() {
   }
 }
 
-function getShareableLink(asPresenter) {
-  const url = `${location.origin}/join?room=${encodeURIComponent(roomId())}${asPresenter ? '&admin=1' : ''}`;
+async function getShareableLink(asPresenter) {
   const target = asPresenter ? 'presenterLinkResult' : 'shareableLinkResult';
-  document.getElementById(target).innerHTML = `<a href="${url}" target="_blank">${url}</a>`;
+  const el = document.getElementById(target);
+  el.textContent = 'Generating...';
+
+  const data = await call('/api/create-link', { roomId: roomId(), isAdmin: asPresenter });
+  if (data.token) {
+    const url = `${location.origin}/join?t=${encodeURIComponent(data.token)}`;
+    el.innerHTML = `<a href="${url}" target="_blank">${url}</a>`;
+  } else {
+    el.innerHTML = `<span class="error">Failed: ${data.msg || 'unknown error'}</span>`;
+  }
 }
 
 function isActive() {

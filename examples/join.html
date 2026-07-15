@@ -23,17 +23,31 @@
 
 <script>
 const params = new URLSearchParams(location.search);
-const roomId = params.get('room');
-const isAdmin = params.get('admin') === '1';
+const token = params.get('t');
 
-if (isAdmin) {
-  document.getElementById('heading').textContent = 'Join as presenter';
-  document.title = 'Join as presenter';
+// Cosmetic only — just picks the heading text. The server independently
+// verifies the token's signature before ever minting a real join token,
+// so tampering with this doesn't grant anything.
+function peekPayload(t) {
+  try {
+    const [body] = (t || '').split('.');
+    return JSON.parse(atob(body.replace(/-/g, '+').replace(/_/g, '/')));
+  } catch {
+    return null;
+  }
 }
 
-if (!roomId) {
-  document.getElementById('error').textContent = 'Missing room in the link.';
+const payload = peekPayload(token);
+
+if (!token || !payload) {
+  document.getElementById('error').textContent = 'This link is invalid or malformed.';
   document.getElementById('joinForm').style.display = 'none';
+} else if (Date.now() > payload.exp) {
+  document.getElementById('error').textContent = 'This link has expired. Ask for a new one.';
+  document.getElementById('joinForm').style.display = 'none';
+} else if (payload.isAdmin) {
+  document.getElementById('heading').textContent = 'Join as presenter';
+  document.title = 'Join as presenter';
 }
 
 document.getElementById('joinForm').addEventListener('submit', async (e) => {
@@ -49,7 +63,7 @@ document.getElementById('joinForm').addEventListener('submit', async (e) => {
     const res = await fetch('/api/join-token', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ roomId, name, isAdmin }),
+      body: JSON.stringify({ token, name }),
     });
     const data = await res.json();
     if (data.joinUrl) {
