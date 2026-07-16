@@ -150,12 +150,21 @@ function openLinksModal(roomId) {
   const backdrop = openModal(`
     <h2>Shareable links</h2>
     <p class="meta">${escapeHtml(roomId)}</p>
-    <div class="actions">
+
+    <div class="link-section link-section--listener">
+      <h3>Listener link <span class="badge badge--listener">Listener</span></h3>
+      <p class="meta">Anyone with this link joins as a listener — no mic/webcam by default.</p>
       <button class="btn secondary" id="genListener">Generate listener link</button>
-      <button class="btn secondary" id="genPresenter">Generate presenter link</button>
+      <div id="listenerLinkResult"></div>
     </div>
-    <div id="listenerLinkResult"></div>
-    <div id="presenterLinkResult"></div>
+
+    <div class="link-section link-section--presenter">
+      <h3>Presenter link <span class="badge badge--presenter">Presenter</span></h3>
+      <p class="meta">Grants presenter/admin rights — only share with trusted presenters.</p>
+      <button class="btn secondary" id="genPresenter">Generate presenter link</button>
+      <div id="presenterLinkResult"></div>
+    </div>
+
     <div class="actions" style="margin-top:1rem;">
       <button class="btn secondary" id="closeLinks">Close</button>
     </div>
@@ -163,19 +172,23 @@ function openLinksModal(roomId) {
 
   backdrop.querySelector('#closeLinks').addEventListener('click', () => closeModal(backdrop));
 
-  async function generate(isAdmin, targetId) {
+  async function generate(isAdmin, targetId, badgeClass, badgeText) {
     try {
       const { token } = await api.createLink(roomId, isAdmin);
       const url = `${location.origin}/join?t=${encodeURIComponent(token)}`;
-      backdrop.querySelector(`#${targetId}`).innerHTML =
-        `<div class="link-row"><a href="${url}" target="_blank">${url}</a></div>`;
+      backdrop.querySelector(`#${targetId}`).innerHTML = `
+        <div class="link-row">
+          <span class="badge ${badgeClass}">${badgeText}</span>
+          <a href="${url}" target="_blank">${url}</a>
+        </div>
+      `;
     } catch (err) {
       toast(err.message, 'error');
     }
   }
 
-  backdrop.querySelector('#genListener').addEventListener('click', () => generate(false, 'listenerLinkResult'));
-  backdrop.querySelector('#genPresenter').addEventListener('click', () => generate(true, 'presenterLinkResult'));
+  backdrop.querySelector('#genListener').addEventListener('click', () => generate(false, 'listenerLinkResult', 'badge--listener', 'Listener'));
+  backdrop.querySelector('#genPresenter').addEventListener('click', () => generate(true, 'presenterLinkResult', 'badge--presenter', 'Presenter'));
 }
 
 async function endRoom(roomId) {

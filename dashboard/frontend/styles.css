@@ -194,3 +194,22 @@ tr:last-child td { border-bottom: none; }
   word-break: break-all;
 }
 .link-row a { color: var(--accent); flex: 1; }
+
+.link-section {
+  border-left: 3px solid var(--border);
+  padding: 0.2rem 0 0.6rem 0.8rem;
+  margin: 1rem 0;
+}
+.link-section h3 { margin: 0 0 0.2rem; font-size: 0.9rem; display: flex; align-items: center; gap: 0.5rem; }
+.link-section--listener { border-left-color: var(--text-dim); }
+.link-section--presenter { border-left-color: var(--accent); }
+
+.badge {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+}
+.badge--listener { background: var(--surface-hover); color: var(--text-dim); }
+.badge--presenter { background: var(--accent); color: white; }
