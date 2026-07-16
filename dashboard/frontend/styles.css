@@ -1,0 +1,196 @@
+:root {
+  --bg: #0f172a;
+  --surface: #1e293b;
+  --surface-hover: #273548;
+  --border: #334155;
+  --accent: #3b82f6;
+  --accent-hover: #2563eb;
+  --text: #e2e8f0;
+  --text-dim: #94a3b8;
+  --danger: #ef4444;
+  --success: #22c55e;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+#app {
+  display: flex;
+  min-height: 100vh;
+}
+
+#sidebar {
+  width: 220px;
+  flex-shrink: 0;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  padding: 1rem 0;
+}
+
+.brand {
+  font-weight: 700;
+  font-size: 1.1rem;
+  padding: 0.5rem 1.2rem 1.5rem;
+}
+
+.nav-item {
+  text-align: left;
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  padding: 0.7rem 1.2rem;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.nav-item:hover {
+  background: var(--surface-hover);
+  color: var(--text);
+}
+
+.nav-item.active {
+  color: var(--text);
+  border-left: 3px solid var(--accent);
+  background: var(--surface-hover);
+}
+
+.nav-item.logout {
+  margin-top: auto;
+  color: var(--danger);
+}
+
+#content {
+  flex: 1;
+  padding: 1.5rem 2rem;
+  overflow-y: auto;
+}
+
+#contentHeader h1 {
+  font-size: 1.4rem;
+  margin: 0 0 1.2rem;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.btn {
+  background: var(--accent);
+  border: none;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+}
+.btn:hover { background: var(--accent-hover); }
+.btn.danger { background: var(--danger); }
+.btn.danger:hover { background: #dc2626; }
+.btn.secondary { background: var(--surface-hover); color: var(--text); }
+.btn:disabled { opacity: 0.5; cursor: default; }
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1rem;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1rem;
+}
+
+.card h3 { margin: 0 0 0.3rem; font-size: 1rem; }
+.card .meta { color: var(--text-dim); font-size: 0.8rem; margin-bottom: 0.8rem; }
+.card .actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--surface);
+  border-radius: 10px;
+  overflow: hidden;
+}
+th, td {
+  text-align: left;
+  padding: 0.7rem 1rem;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.9rem;
+}
+th { color: var(--text-dim); font-weight: 600; font-size: 0.8rem; text-transform: uppercase; }
+tr:last-child td { border-bottom: none; }
+
+.empty-state {
+  color: var(--text-dim);
+  padding: 2rem;
+  text-align: center;
+}
+
+.toast {
+  padding: 0.7rem 1rem;
+  border-radius: 6px;
+  margin-bottom: 0.6rem;
+  font-size: 0.9rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+.toast.error { border-color: var(--danger); color: #fca5a5; }
+.toast.success { border-color: var(--success); color: #86efac; }
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+.modal {
+  background: var(--surface);
+  border-radius: 10px;
+  padding: 1.5rem;
+  width: 100%;
+  max-width: 480px;
+  max-height: 85vh;
+  overflow-y: auto;
+}
+.modal h2 { margin-top: 0; font-size: 1.1rem; }
+
+.field { margin-bottom: 1rem; }
+.field label { display: block; font-size: 0.85rem; margin-bottom: 0.3rem; color: var(--text-dim); }
+.field input[type="text"] {
+  width: 100%;
+  padding: 0.6rem;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+}
+.checkbox-row { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; font-size: 0.9rem; }
+.checkbox-row input { width: auto; }
+
+.link-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.5rem 0.7rem;
+  margin-top: 0.5rem;
+  font-size: 0.8rem;
+  word-break: break-all;
+}
+.link-row a { color: var(--accent); flex: 1; }

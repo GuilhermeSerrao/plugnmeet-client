@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Join meeting</title>
+<style>
+  :root { --bg: #0f172a; --surface: #1e293b; --accent: #3b82f6; --text: #e2e8f0; --danger: #ef4444; }
+  * { box-sizing: border-box; }
+  body { font-family: system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; align-items: center; justify-content: center; margin: 0; padding: 0 1rem; }
+  form { background: var(--surface); padding: 2rem; border-radius: 12px; width: 100%; max-width: 380px; }
+  label { display: block; font-size: 0.85rem; margin: 0.8rem 0 0.4rem; opacity: 0.8; }
+  input { width: 100%; padding: 0.7rem; border-radius: 6px; border: 1px solid #334155; background: #0f172a; color: var(--text); font-size: 1rem; box-sizing: border-box; }
+  button { width: 100%; margin-top: 1.2rem; padding: 0.7rem 1.2rem; cursor: pointer; border: none; border-radius: 6px; background: var(--accent); color: white; font-size: 1rem; }
+  .error { color: var(--danger); margin-top: 0.8rem; font-size: 0.9rem; }
+  h1 { font-size: 1.3rem; margin: 0; }
+</style>
+</head>
+<body>
+<form id="joinForm">
+  <h1 id="heading">Join meeting</h1>
+  <label>Your name</label>
+  <input id="name" required autofocus placeholder="e.g. Guilherme">
+  <button type="submit">Join</button>
+</form>
+<p id="error" class="error"></p>
+
+<script>
+const params = new URLSearchParams(location.search);
+const token = params.get('t');
+
+// Cosmetic only — just picks the heading text. The server independently
+// verifies the token's signature before ever minting a real join token,
+// so tampering with this doesn't grant anything.
+function peekPayload(t) {
+  try {
+    const [body] = (t || '').split('.');
+    return JSON.parse(atob(body.replace(/-/g, '+').replace(/_/g, '/')));
+  } catch {
+    return null;
+  }
+}
+
+const payload = peekPayload(token);
+
+if (!token || !payload) {
+  document.getElementById('error').textContent = 'This link is invalid or malformed.';
+  document.getElementById('joinForm').style.display = 'none';
+} else if (Date.now() > payload.exp) {
+  document.getElementById('error').textContent = 'This link has expired. Ask for a new one.';
+  document.getElementById('joinForm').style.display = 'none';
+} else if (payload.isAdmin) {
+  document.getElementById('heading').textContent = 'Join as presenter';
+  document.title = 'Join as presenter';
+}
+
+document.getElementById('joinForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const name = document.getElementById('name').value.trim();
+  if (!name) return;
+
+  const button = e.target.querySelector('button');
+  button.disabled = true;
+  button.textContent = 'Joining...';
+
+  try {
+    const res = await fetch('/api/join-token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token, name }),
+    });
+    const data = await res.json();
+    if (data.joinUrl) {
+      location.href = data.joinUrl;
+    } else {
+      throw new Error(data.msg || 'Failed to join');
+    }
+  } catch (err) {
+    document.getElementById('error').textContent = err.message;
+    button.disabled = false;
+    button.textContent = 'Join';
+  }
+});
+</script>
+</body>
+</html>

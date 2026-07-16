@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>plugNmeet dashboard</title>
+<link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+<div id="app">
+  <nav id="sidebar">
+    <div class="brand">plugNmeet</div>
+    <button class="nav-item" data-view="rooms">Rooms</button>
+    <button class="nav-item" data-view="recordings">Recordings</button>
+    <button class="nav-item" data-view="artifacts">Artifacts</button>
+    <button class="nav-item" data-view="past-rooms">Past Rooms</button>
+    <button id="logoutBtn" class="nav-item logout">Log out</button>
+  </nav>
+  <main id="content">
+    <header id="contentHeader">
+      <h1 id="viewTitle"></h1>
+    </header>
+    <div id="toasts"></div>
+    <div id="viewContainer"></div>
+  </main>
+</div>
+<script type="module" src="./main.js"></script>
+</body>
+</html>

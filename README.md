@@ -115,6 +115,18 @@ node --env-file=.env examples/server.js
 
 Open `http://localhost:3000`. The page lets you: create a room, generate a join link (as admin or guest), check if a room is active, list active rooms, and end a room. All actions share a single Room ID field, so create the room first before generating a join link for it.
 
+## Dashboard (production admin UI)
+
+`dashboard/` is a proper session-authenticated dashboard for managing rooms, recordings,
+artifacts, and past-room history — built for real use (Coolify deploy, login page, no Basic
+Auth popup), unlike the `examples/` tester above. See `dashboard/Dockerfile` for deployment;
+locally:
+
+```bash
+cd dashboard && npm install && npm run build
+node --env-file=../.env server.js
+```
+
 ## API coverage
 
 All methods are `async` and throw an `Error` (with `.statusCode` and `.response`) when the API returns `status: false`.

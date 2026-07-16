@@ -2,3 +2,4 @@
 node_modules/
 plugnmeet-nodejs-client-handoff.md
 .claude/
+dashboard/dist/
