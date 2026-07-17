@@ -2,7 +2,6 @@ import { api } from '../api.js';
 import { toast } from '../toast.js';
 import { openModal, closeModal } from '../modal.js';
 import { escapeHtml, formatTimestamp } from '../util.js';
-import { refreshCurrentView } from '../router.js';
 
 const LOCK_FIELDS = [
   ['lock_microphone', 'Disable microphone for everyone', false],
@@ -196,8 +195,21 @@ async function endRoom(roomId) {
   try {
     await api.endRoom(roomId);
     toast('Room ended');
-    refreshCurrentView();
+    removeRoomCard(roomId);
   } catch (err) {
     toast(err.message, 'error');
   }
+}
+
+function removeRoomCard(roomId) {
+  const grid = document.getElementById('roomsGrid');
+  if (!grid) return;
+  grid.querySelector(`[data-action="end"][data-id="${cssEscape(roomId)}"]`)?.closest('.card')?.remove();
+  if (!grid.querySelector('.card')) {
+    grid.innerHTML = '<p class="empty-state">No active rooms. Create one to get started.</p>';
+  }
+}
+
+function cssEscape(value) {
+  return window.CSS?.escape ? CSS.escape(value) : value.replace(/["\\]/g, '\\$&');
 }
