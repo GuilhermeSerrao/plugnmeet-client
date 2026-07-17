@@ -2,6 +2,10 @@ import { createHmac } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 import { basename } from 'node:path';
 
+// plugNmeet-server closes a room this many seconds after it becomes empty.
+// Default to effectively "never" so rooms only end via explicit admin action.
+const NEVER_AUTO_CLOSE_EMPTY_TIMEOUT = 31536000; // 1 year
+
 const DEFAULT_ROOM_METADATA = {
   room_title: 'Test room',
   welcome_message: 'Welcome to room',
@@ -150,7 +154,7 @@ export default class PlugNMeetClient {
     metadata = mergeDeep(metadata, options.metadata || {});
     const body = { room_id: roomId, metadata };
     if (options.max_participants !== undefined) body.max_participants = options.max_participants;
-    if (options.empty_timeout !== undefined) body.empty_timeout = options.empty_timeout;
+    body.empty_timeout = options.empty_timeout ?? NEVER_AUTO_CLOSE_EMPTY_TIMEOUT;
     return this.#request('/room/create', body);
   }
 
