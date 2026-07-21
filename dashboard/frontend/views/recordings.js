@@ -25,7 +25,7 @@ async function load(container) {
           <tr>
             <td>${escapeHtml(r.room_id)}</td>
             <td>${formatDate(r.creation_time)}</td>
-            <td>${formatBytes(r.file_size)}</td>
+            <td>${formatBytes(r.file_size * 1024 * 1024)}</td>
             <td>
               <a class="btn secondary" href="/api/recordings/${encodeURIComponent(r.record_id)}/download" target="_blank">Download</a>
               <button class="btn danger" data-id="${escapeHtml(r.record_id)}">Delete</button>
