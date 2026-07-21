@@ -252,10 +252,10 @@ export default class PlugNMeetClient {
 
   // ---- Recording ----
 
-  async fetchRecordings(roomIds, { roomSid = '', from = 0, limit = 20, orderBy = 'DESC' } = {}) {
+  async fetchRecordings(roomIds, { roomSid, from = 0, limit = 20, orderBy = 'DESC' } = {}) {
     return this.#request('/recording/fetch', {
       room_ids: roomIds,
-      room_sid: roomSid,
+      room_sid: roomSid || undefined,
       from,
       limit,
       order_by: orderBy,
