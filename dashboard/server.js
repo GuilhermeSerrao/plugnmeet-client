@@ -11,7 +11,7 @@ const PUBLIC_DIR = join(__dirname, 'public');
 
 const PORT = process.env.PORT || 3000;
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
-const LINK_TTL_MS = 24 * 60 * 60 * 1000; // shareable join links expire after 24h
+const LINK_TTL_MS = 30 * 24 * 60 * 60 * 1000; // shareable join links expire after 30 days
 const SESSION_TTL_MS = 7 * 24 * 60 * 60 * 1000; // dashboard sessions expire after 7 days
 
 const client = new PlugNMeetClient({
